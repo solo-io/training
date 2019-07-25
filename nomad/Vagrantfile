@@ -130,6 +130,12 @@ Vagrant.configure(2) do |config|
   # Vagrant does this by default; including so its apparent to user
   config.vm.synced_folder ".", "/vagrant"
 
+  # Expose Consul HTTP
+  config.vm.network "forwarded_port", guest: 8500, host: 8500, auto_correct: true
+
+  # Expose Vault HTTP
+  config.vm.network "forwarded_port", guest: 8200, host: 8200, auto_correct: true
+
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
     p.memory = "4096"

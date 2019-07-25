@@ -136,6 +136,65 @@ static_resources:
     http2_protocol_options: {}
     type: STATIC
 
+  - name: admin_port_cluster
+    connect_timeout: 5.000s
+    type: STATIC
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: admin_port_cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 19000
+
+  listeners:
+    - name: prometheus_listener
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8081
+      filter_chains:
+        - filters:
+            - name: envoy.http_connection_manager
+              config:
+                codec_type: auto
+                stat_prefix: prometheus
+                route_config:
+                  name: prometheus_route
+                  virtual_hosts:
+                    - name: prometheus_host
+                      domains:
+                        - "*"
+                      routes:
+                        - match:
+                            path: "/ready"
+                            headers:
+                            - name: ":method"
+                              exact_match: GET
+                          route:
+                            cluster: admin_port_cluster
+                        - match:
+                            path: "/server_info"
+                            headers:
+                            - name: ":method"
+                              exact_match: GET
+                          route:
+                            cluster: admin_port_cluster
+                        - match:
+                            prefix: "/metrics"
+                            headers:
+                            - name: ":method"
+                              exact_match: GET
+                          route:
+                            prefix_rewrite: "/stats/prometheus"
+                            cluster: admin_port_cluster
+                http_filters:
+                  - name: envoy.router
+                    config: {}
+
 dynamic_resources:
   ads_config:
     api_type: GRPC
