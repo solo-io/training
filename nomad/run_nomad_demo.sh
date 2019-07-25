@@ -42,7 +42,7 @@ if [[ -f "$CONSUL_PID_FILE" ]]; then
 fi
 
 # Start Consul
-consul agent -dev --client 0.0.0.0 >consul.log 2>&1 &
+consul agent -dev --client 0.0.0.0 -data-dir=$(pwd)/consul-data >consul.log 2>&1 &
 
 echo $! > "$CONSUL_PID_FILE"
 
@@ -57,11 +57,10 @@ echo $! > "$VAULT_PID_FILE"
 sleep 5
 
 # Start Nomad
-nomad agent -dev \
-  --vault-enabled=true \
-  --vault-address=http://127.0.0.1:8200 \
-  --vault-token=root \
-  -network-interface en0 \
+sudo nomad agent -config $(pwd)/nomad-data \
+  -vault-enabled=true \
+  -vault-address=http://127.0.0.1:8200 \
+  -vault-token=root \
   >nomad.log 2>&1 &
 
 echo $! > "$NOMAD_PID_FILE"
