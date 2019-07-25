@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# Expects
-# brew install nomad consul vault httpie
-
-# Optional
-# brew install jq
-
 # Will exit script if we would use an uninitialised variable:
 set -o nounset
 # Will exit script when a simple command (not a control structure) fails:
@@ -18,61 +12,55 @@ function print_error {
 }
 trap print_error ERR
 
-# Get directory this script is located in to access script local files
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# Cleanup from past sessions
+# # Start Consul
+# consul agent -dev --client 0.0.0.0
 
-NOMAD_PID_FILE="$SCRIPT_DIR/nomad.pid"
-if [[ -f "$NOMAD_PID_FILE" ]]; then
-  (cat "$NOMAD_PID_FILE" | xargs kill) && true # Ignore errors killing old process
-  rm "$NOMAD_PID_FILE"
-fi
+# # Start Vault
+# vault server -dev -dev-root-token-id=root \
+#   -log-level=trace \
+#   -dev-listen-address 0.0.0.0:8200
 
-VAULT_PID_FILE="$SCRIPT_DIR/vault.pid"
-if [[ -f "$VAULT_PID_FILE" ]]; then
-  (cat "$VAULT_PID_FILE" | xargs kill) && true # Ignore errors killing old process
-  rm "$VAULT_PID_FILE"
-fi
+# sleep 5
 
-CONSUL_PID_FILE="$SCRIPT_DIR/consul.pid"
-if [[ -f "$CONSUL_PID_FILE" ]]; then
-  (cat "$CONSUL_PID_FILE" | xargs kill) && true # Ignore errors killing old process
-  rm "$CONSUL_PID_FILE"
-fi
+# # Start Nomad
+# sudo nomad agent -dev \
+#   -vault-enabled=true \
+#   -vault-address=http://127.0.0.1:8200 \
+#   -vault-token=root \
+#   -network-interface docker0
 
-# Start Consul
-consul agent -dev --client 0.0.0.0 -data-dir=$(pwd)/consul-data >consul.log 2>&1 &
 
-echo $! > "$CONSUL_PID_FILE"
 
-# Start Vault
-vault server -dev -dev-root-token-id=root \
-  -log-level=trace \
-  -dev-listen-address 0.0.0.0:8200 \
-  >vault.log 2>&1 &
+vault policy write gloo /vagrant/gloo-policy.hcl
 
-echo $! > "$VAULT_PID_FILE"
+export DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
 
-sleep 5
+nomad run petstore.nomad
 
-# Start Nomad
-sudo nomad agent -config $(pwd)/nomad-data \
-  -vault-enabled=true \
-  -vault-address=http://127.0.0.1:8200 \
-  -vault-token=root \
-  -network-interface docker0 \
-  >nomad.log 2>&1 &
+sleep 10
 
-echo $! > "$NOMAD_PID_FILE"
+docker ps
 
-sleep 20
+export PETSTORE_IP=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostIp")}}')
+export PETSTORE_PORT=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostPort")}}')
+export PETSTORE_URL=http://${PETSTORE_IP}:${PETSTORE_PORT}
 
-VAULT_ADDR=http://127.0.0.1:8200 vault policy write gloo ./gloo-policy.hcl
+printf "PETSTORE_URL (%s) should equal 'http://172.17.0.1:20222'\n", $PETSTORE_URL
 
-nomad run ./petstore.nomad
-nomad run ./gloo.nomad
+echo "Call petstore direct"
+# curl $PETSTORE_URL/api/pets
+http --json $PETSTORE_URL/api/pets
 
-DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
+nomad run gloo.nomad
 
-curl $DOCKER_IP:28080/petstore
+sleep 10
+
+echo "Call through Gloo"
+# curl $DOCKER_IP:28080/petstore
+http --json $DOCKER_IP:28080/petstore
+
+# curl $DOCKER_IP:28080/petstore/findWithId/2
+http --json $DOCKER_IP:28080/petstore/findWithId/2
+
+socat TCP-LISTEN:19000,fork TCP:172.17.0.1:29000 &

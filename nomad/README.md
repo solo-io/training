@@ -1,23 +1,18 @@
 # Solo.io Gloo and Hashicorp Nomad
 
+Pre-requisites
+
+* Vagrant and Virtual Box
+
 ```shell
-DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
+vagrant up && vagrant ssh
+[vagrant@nomad:~$] cd /vagrant
+[vagrant@nomad:/vagrant$] ./run_nomad_demo.sh
+```
 
-nomad run petstore.nomad
+To expose Gloo admin ui from vagrant after installing gloo on nomad, run the follow to effectively bridge from `docker0`
+network interface to host <http://localhost:19000>
 
-docker ps
-
-export PETSTORE_IP=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostIp")}}')
-export PETSTORE_PORT=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostPort")}}')
-export PETSTORE_URL=http://${PETSTORE_IP}:${PETSTORE_PORT}
-
-printf "PETSTORE_URL (%s) should equal 'http://172.17.0.1:20222'\n", $PETSTORE_URL
-
-# curl $PETSTORE_URL/api/pets
-http --json $PETSTORE_URL/api/pets
-
-nomad run gloo.nomad
-
-# curl $DOCKER_IP:28080/petstore
-http --json $DOCKER_IP:28080/petstore
+```shell
+socat tcp:localhost:19000,fork TCP:172.17.0.1:29000 &
 ```
