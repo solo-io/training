@@ -23,10 +23,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Cleanup from past sessions
 
-CONSUL_PID_FILE="$SCRIPT_DIR/consul.pid"
-if [[ -f "$CONSUL_PID_FILE" ]]; then
-  (cat "$CONSUL_PID_FILE" | xargs kill) && true # Ignore errors killing old process
-  rm "$CONSUL_PID_FILE"
+NOMAD_PID_FILE="$SCRIPT_DIR/nomad.pid"
+if [[ -f "$NOMAD_PID_FILE" ]]; then
+  (cat "$NOMAD_PID_FILE" | xargs kill) && true # Ignore errors killing old process
+  rm "$NOMAD_PID_FILE"
 fi
 
 VAULT_PID_FILE="$SCRIPT_DIR/vault.pid"
@@ -35,10 +35,10 @@ if [[ -f "$VAULT_PID_FILE" ]]; then
   rm "$VAULT_PID_FILE"
 fi
 
-NOMAD_PID_FILE="$SCRIPT_DIR/nomad.pid"
-if [[ -f "$NOMAD_PID_FILE" ]]; then
-  (cat "$NOMAD_PID_FILE" | xargs kill) && true # Ignore errors killing old process
-  rm "$NOMAD_PID_FILE"
+CONSUL_PID_FILE="$SCRIPT_DIR/consul.pid"
+if [[ -f "$CONSUL_PID_FILE" ]]; then
+  (cat "$CONSUL_PID_FILE" | xargs kill) && true # Ignore errors killing old process
+  rm "$CONSUL_PID_FILE"
 fi
 
 # Start Consul

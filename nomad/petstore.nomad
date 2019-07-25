@@ -35,7 +35,7 @@ job "petstore" {
       driver = "docker"
 
       config {
-        image = "soloio/petstore-example:latest"
+        image = "quay.io/solo-io/petstore:v1"
         port_map {
           http = 8080
         }
@@ -52,7 +52,14 @@ job "petstore" {
 
       service {
         name = "petstore"
+        tags = ["petstore"]
         port = "http"
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
     }
   }
