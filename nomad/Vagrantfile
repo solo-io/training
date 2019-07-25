@@ -23,6 +23,8 @@ sudo docker --version
 # Packages required for nomad & consul
 sudo apt-get install unzip curl vim -y
 
+sudo apt-get -y httpie
+
 echo "Installing Nomad..."
 NOMAD_VERSION=0.9.3
 cd /tmp/
