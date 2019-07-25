@@ -124,12 +124,15 @@ Vagrant.configure(2) do |config|
   # Expose the nomad api and ui to the host
   config.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
 
-  # Expose the Gloo admin ui
+  # Expose the Gloo admin ui - requires extra redirect `socat tcp:localhost:19000,fork TCP:172.17.0.1:29000 &`
   config.vm.network "forwarded_port", guest: 19000, host: 19000, auto_correct: true
+
+  # Vagrant does this by default; including so its apparent to user
+  config.vm.synced_folder ".", "/vagrant"
 
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
-    p.memory = "1024"
+    p.memory = "4096"
   end
 
   # Increase memory for Virtualbox
@@ -140,7 +143,7 @@ Vagrant.configure(2) do |config|
   # Increase memory for VMware
   ["vmware_fusion", "vmware_workstation"].each do |p|
     config.vm.provider p do |v|
-      v.vmx["memsize"] = "1024"
+      v.vmx["memsize"] = "4096"
     end
   end
 end

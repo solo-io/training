@@ -21,15 +21,12 @@ trap print_error ERR
 #   -log-level=trace \
 #   -dev-listen-address 0.0.0.0:8200
 
-# sleep 5
-
 # # Start Nomad
 # sudo nomad agent -dev \
 #   -vault-enabled=true \
 #   -vault-address=http://127.0.0.1:8200 \
 #   -vault-token=root \
 #   -network-interface docker0
-
 
 
 vault policy write gloo /vagrant/gloo-policy.hcl
@@ -62,5 +59,3 @@ http --json $DOCKER_IP:28080/petstore
 
 # curl $DOCKER_IP:28080/petstore/findWithId/2
 http --json $DOCKER_IP:28080/petstore/findWithId/2
-
-socat TCP-LISTEN:19000,fork TCP:172.17.0.1:29000 &
