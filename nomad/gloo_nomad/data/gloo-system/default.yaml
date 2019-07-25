@@ -1,0 +1,12 @@
+bindAddr: 0.0.0.0:9977
+devMode: true
+discoveryNamespace: gloo-system
+kubernetesArtifactSource: {}
+kubernetesConfigSource: {}
+kubernetesSecretSource: {}
+metadata:
+  name: default
+  namespace: gloo-system
+  resourceVersion: "2"
+refreshRate: 60s
+status: {}
