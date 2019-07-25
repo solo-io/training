@@ -61,6 +61,7 @@ sudo nomad agent -config $(pwd)/nomad-data \
   -vault-enabled=true \
   -vault-address=http://127.0.0.1:8200 \
   -vault-token=root \
+  -network-interface docker0 \
   >nomad.log 2>&1 &
 
 echo $! > "$NOMAD_PID_FILE"
@@ -70,4 +71,8 @@ sleep 20
 VAULT_ADDR=http://127.0.0.1:8200 vault policy write gloo ./gloo-policy.hcl
 
 nomad run ./petstore.nomad
-# nomad run ./gloo.nomad
+nomad run ./gloo.nomad
+
+DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
+
+curl $DOCKER_IP:28080/petstore

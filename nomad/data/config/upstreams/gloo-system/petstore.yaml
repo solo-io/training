@@ -4,12 +4,12 @@ metadata:
 upstreamSpec:
   static:
     hosts:
-    - addr: 10.1.10.202
-      port: 20817
+    - addr: 172.17.0.1
+      port: 20222
     serviceSpec:
       rest:
         swaggerInfo:
-          url: http://petstore:8080/swagger.json
+          url: http://172.17.0.1:20222/swagger.json
         transformations:
           addPet:
             body:

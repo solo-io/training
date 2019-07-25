@@ -41,9 +41,11 @@ job "gloo" {
           "--dir=/data/",
         ]
         volumes = [
-          "/Users/scranton/workspace/training/nomad/data:/data/",
+          "/vagrant/data:/data/",
         ]
-        port_map {}
+        port_map {
+          xds = 9977
+        }
       }
 
       resources {
@@ -78,7 +80,7 @@ job "gloo" {
           "--dir=/data/",
         ]
         volumes = [
-          "/Users/scranton/workspace/training/nomad/gloo_nomad/data:/data/",
+          "/vagrant/data:/data/",
         ]
       }
 
@@ -160,9 +162,15 @@ EOF
         memory = 256
         network {
           mbits = 10
-          port "http" {}
-          port "https" {}
-          port "admin" {}
+          port "http" {
+            static = 28080
+          }
+          port "https" {
+            static = 28443
+          }
+          port "admin" {
+            static = 29000
+          }
         }
       }
 

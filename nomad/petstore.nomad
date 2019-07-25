@@ -46,7 +46,9 @@ job "petstore" {
         memory = 256
         network {
           mbits = 10
-          port "http" {}
+          port "http" {
+            static = 20222
+          }
         }
       }
 
