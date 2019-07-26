@@ -9,9 +9,9 @@ sudo apt-get -y install apt-transport-https ca-certificates curl software-proper
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg |  sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository \
-      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) \
-      stable"
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) \
+  stable"
 sudo apt-get update
 sudo apt-get -y install docker-ce
 # Restart docker to make sure we get the latest version of the daemon if there is an upgrade
@@ -67,7 +67,7 @@ cat <<-EOF
 
   [Service]
   Restart=on-failure
-  ExecStart=/usr/bin/consul agent -dev
+  ExecStart=/usr/bin/consul agent -dev --client=0.0.0.0
   ExecReload=/bin/kill -HUP $MAINPID
 
   [Install]
@@ -91,7 +91,7 @@ cat <<-EOF
 
   [Service]
   Restart=on-failure
-  ExecStart=/usr/bin/vault server -dev -dev-root-token-id=root
+  ExecStart=/usr/bin/vault server -dev -dev-root-token-id=root -dev-listen-address=0.0.0.0:8200 -log-level=trace
   ExecReload=/bin/kill -HUP $MAINPID
 
   [Install]
@@ -113,6 +113,7 @@ nomad -autocomplete-install
 
 echo "export VAULT_ADDR='http://127.0.0.1:8200'" >> ~/.bashrc
 echo "export VAULT_TOKEN='root'" >> ~/.bashrc
+echo "socat TCP4-LISTEN:19000,fork TCP:172.17.0.1:29000 &" >> ~/.bashrc
 
 SCRIPT
 
@@ -121,14 +122,20 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = "nomad"
   config.vm.provision "shell", inline: $script, privileged: false
 
+  # Vagrant does this by default; including so its apparent to user
+  config.vm.synced_folder ".", "/vagrant"
+
   # Expose the nomad api and ui to the host
   config.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
 
+  # Expose the nomad fabio ui
+  config.vm.network "forwarded_port", guest: 9998, host: 9998, auto_correct: true
+
+  # Expose the nomad fabio lb
+  config.vm.network "forwarded_port", guest: 9999, host: 9999, auto_correct: true
+
   # Expose the Gloo admin ui - requires extra redirect `socat tcp:localhost:19000,fork TCP:172.17.0.1:29000 &`
   config.vm.network "forwarded_port", guest: 19000, host: 19000, auto_correct: true
-
-  # Vagrant does this by default; including so its apparent to user
-  config.vm.synced_folder ".", "/vagrant"
 
   # Expose Consul HTTP
   config.vm.network "forwarded_port", guest: 8500, host: 8500, auto_correct: true

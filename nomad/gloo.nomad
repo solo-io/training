@@ -45,7 +45,12 @@ job "gloo" {
         ]
         port_map {
           xds = 9977
+          metrics = 9091
         }
+      }
+
+      env {
+        START_STATS_SERVER = "true"
       }
 
       resources {
@@ -54,6 +59,7 @@ job "gloo" {
         network {
           mbits = 10
           port "xds" {}
+          port "metrics" {}
         }
       }
 
@@ -64,6 +70,19 @@ job "gloo" {
         check {
           name = "alive"
           type = "tcp"
+          interval = "10s"
+          timeout = "2s"
+        }
+      }
+
+      service {
+        name = "gloo"
+        tags = ["gloo","metrics"]
+        port = "metrics"
+        check {
+          name = "alive"
+          type = "tcp"
+          path = "/metrics"
           interval = "10s"
           timeout = "2s"
         }
@@ -82,6 +101,13 @@ job "gloo" {
         volumes = [
           "/vagrant/data:/data/",
         ]
+        port_map {
+          metrics = 9091
+        }
+      }
+
+      env {
+        START_STATS_SERVER = "true"
       }
 
       resources {
@@ -89,6 +115,20 @@ job "gloo" {
         memory = 256
         network {
           mbits = 10
+          port "metrics" {}
+        }
+      }
+
+      service {
+        name = "gateway"
+        tags = ["gloo","metrics"]
+        port = "metrics"
+        check {
+          name = "alive"
+          type = "tcp"
+          path = "/metrics"
+          interval = "10s"
+          timeout = "2s"
         }
       }
     }
@@ -101,6 +141,7 @@ job "gloo" {
           http = 8080
           https = 8443
           admin = 19000
+          stats = 8081
         }
         entrypoint = ["envoy"]
         args = [
@@ -230,6 +271,7 @@ EOF
           port "admin" {
             static = 29000
           }
+          port "stats" {}
         }
       }
 
@@ -273,6 +315,23 @@ EOF
         check {
           name = "alive"
           type = "tcp"
+          interval = "10s"
+          timeout = "2s"
+        }
+      }
+
+      service {
+        name = "gateway-proxy"
+        tags = [
+          "gloo",
+          "stats",
+          "metrics",
+        ]
+        port = "stats"
+        check {
+          name = "alive"
+          type = "tcp"
+          path = "/ready"
           interval = "10s"
           timeout = "2s"
         }

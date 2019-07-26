@@ -2,17 +2,19 @@
 
 Pre-requisites
 
-* Vagrant and Virtual Box
+* Vagrant
+* Virtual Box
 
 ```shell
 vagrant up && vagrant ssh
-[vagrant@nomad:~$] cd /vagrant
-[vagrant@nomad:/vagrant$] ./run_nomad_demo.sh
+[vagrant@nomad:~$] cd /vagrant && ./run_nomad_demo.sh
 ```
 
-To expose Gloo admin ui from vagrant after installing gloo on nomad, run the follow to effectively bridge from `docker0`
-network interface to host <http://localhost:19000>
+Ports
 
-```shell
-socat tcp:localhost:19000,fork TCP:172.17.0.1:29000 &
-```
+* Nomad UI - <http://localhost:4646>
+* Fabio UI - <http://localhost:9998/>
+* Fabio LB - <http://localhost:9999>
+* Gloo admin UI - <http://localhost:19000/>
+* Consul UI - <http://localhost:8500>
+* Vault UI - <http://localhost:8200> token:root

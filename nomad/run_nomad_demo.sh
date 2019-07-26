@@ -31,19 +31,21 @@ trap print_error ERR
 
 vault policy write gloo /vagrant/gloo-policy.hcl
 
-export DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
+# export DOCKER_IP=$(/sbin/ifconfig docker0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
+
+nomad run fabio.nomad
+
+nomad run prometheus.nomad
 
 nomad run petstore.nomad
 
 sleep 10
 
-docker ps
-
 export PETSTORE_IP=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostIp")}}')
 export PETSTORE_PORT=$(docker inspect $(docker ps | grep petstore | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostPort")}}')
 export PETSTORE_URL=http://${PETSTORE_IP}:${PETSTORE_PORT}
 
-printf "PETSTORE_URL (%s) should equal 'http://172.17.0.1:20222'\n", $PETSTORE_URL
+printf "PETSTORE_URL (%s) should equal 'http://172.17.0.1:20222'\n" $PETSTORE_URL
 
 echo "Call petstore direct"
 # curl $PETSTORE_URL/api/pets
@@ -51,11 +53,15 @@ http --json $PETSTORE_URL/api/pets
 
 nomad run gloo.nomad
 
-sleep 10
+sleep 15
+
+export GATEWAY_IP=$(docker inspect $(docker ps | grep gateway-proxy | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostIp")}}')
+export GATEWAY_PORT=$(docker inspect $(docker ps | grep gateway-proxy | awk '{print $1}') -f '{{printf "%v" (index (index (index .NetworkSettings.Ports "8080/tcp") 0) "HostPort")}}')
+export GATEWAY_URL=http://${GATEWAY_IP}:${GATEWAY_PORT}
 
 echo "Call through Gloo"
-# curl $DOCKER_IP:28080/petstore
-http --json $DOCKER_IP:28080/petstore
+# curl $GATEWAY_URL/petstore
+http --json $GATEWAY_URL/petstore
 
-# curl $DOCKER_IP:28080/petstore/findWithId/2
-http --json $DOCKER_IP:28080/petstore/findWithId/2
+# curl $GATEWAY_URL/petstore/findWithId/2
+http --json $GATEWAY_URL/petstore/findWithId/2
