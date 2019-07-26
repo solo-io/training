@@ -2,10 +2,14 @@ metadata:
   name: petstore
   namespace: gloo-system
 upstreamSpec:
-  consul:
-    serviceName: petstore
-    serviceTags:
-    - http
+  static:
+    hosts:
+    - addr: 172.17.0.1
+      port: 20222
+  # consul:
+  #   serviceName: petstore
+  #   serviceTags:
+  #   - http
     serviceSpec:
       rest:
         swaggerInfo:
