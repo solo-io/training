@@ -1,15 +1,16 @@
+bindAddr: 0.0.0.0:9977
+consul:
+  address: host.docker.internal:8500
+  serviceDiscovery: {}
+consulKvSource: {}
+directoryArtifactSource:
+  directory: /data/artifact
+discoveryNamespace: gloo-system
 metadata:
   name: default
   namespace: gloo-system
-bindAddr: 0.0.0.0:9977
-devMode: true
-discoveryNamespace: gloo-system
-directoryArtifactSource:
-  directory: /data/artifact
-directoryConfigSource:
-  directory: /data/config
-directorySecretSource:
-  directory: /data/secret
 refreshRate: 60s
-watchNamespaces:
-- gloo-system
+status: {}
+vaultSecretSource:
+  address: http://host.docker.internal:8200
+  token: root

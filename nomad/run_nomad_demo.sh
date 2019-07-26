@@ -51,6 +51,113 @@ echo "Call petstore direct"
 # curl $PETSTORE_URL/api/pets
 http --json $PETSTORE_URL/api/pets
 
+# glooctl add route --default --path-prefix /petstore --dest-name petstore --prefix-rewrite /api/pets --yaml > vs-default.yaml
+
+consul kv put gloo/gateway.solo.io/v1/VirtualService/gloo-system/default - <<EOF
+metadata:
+  name: default
+  namespace: gloo-system
+virtualHost:
+  domains:
+  - '*'
+  name: gloo-system.default
+  routes:
+  - matcher:
+      prefix: /petstore/findWithId
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: findPetById
+            parameters:
+              headers:
+                :path: /petstore/findWithId/{id}
+        upstream:
+          name: petstore
+          namespace: gloo-system
+  - matcher:
+      prefix: /petstore/findPets
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: findPets
+            parameters: {}
+        upstream:
+          name: petstore
+          namespace: gloo-system
+  - matcher:
+      prefix: /petstore
+    routeAction:
+      single:
+        upstream:
+          name: petstore
+          namespace: gloo-system
+    routePlugins:
+      prefixRewrite:
+        prefixRewrite: /api/pets
+EOF
+
+# glooctl create upstream consul --name petstore --consul-service petstore --consul-service-tags http --service-spec-type "" --yaml > us-petstore.yaml
+
+consul kv put gloo/gloo.solo.io/v1/Upstream/gloo-system/petstore - <<EOF
+metadata:
+  name: petstore
+  namespace: gloo-system
+upstreamSpec:
+  consul:
+    serviceName: petstore
+    serviceTags:
+    - http
+    serviceSpec:
+      rest:
+        swaggerInfo:
+          url: http://172.17.0.1:20222/swagger.json
+        transformations:
+          addPet:
+            body:
+              text: '{"id": {{ default(id, "") }},"name": "{{ default(name, "")}}","tag":
+                "{{ default(tag, "")}}"}'
+            headers:
+              :method:
+                text: POST
+              :path:
+                text: /api/pets
+              content-type:
+                text: application/json
+          deletePet:
+            headers:
+              :method:
+                text: DELETE
+              :path:
+                text: /api/pets/{{ default(id, "") }}
+              content-type:
+                text: application/json
+          findPetById:
+            body: {}
+            headers:
+              :method:
+                text: GET
+              :path:
+                text: /api/pets/{{ default(id, "") }}
+              content-length:
+                text: "0"
+              content-type: {}
+              transfer-encoding: {}
+          findPets:
+            body: {}
+            headers:
+              :method:
+                text: GET
+              :path:
+                text: /api/pets?tags={{default(tags, "")}}&limit={{default(limit,
+                  "")}}
+              content-length:
+                text: "0"
+              content-type: {}
+              transfer-encoding: {}
+EOF
+
 nomad run gloo.nomad
 
 sleep 15

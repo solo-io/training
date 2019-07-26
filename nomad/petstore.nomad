@@ -54,7 +54,7 @@ job "petstore" {
 
       service {
         name = "petstore"
-        tags = ["petstore"]
+        tags = ["petstore", "http"]
         port = "http"
         check {
           name     = "alive"
