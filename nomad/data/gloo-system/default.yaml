@@ -1,6 +1,6 @@
 bindAddr: 0.0.0.0:9977
 consul:
-  address: host.docker.internal:8500
+  address: 10.0.2.15:8500
   serviceDiscovery: {}
 consulKvSource: {}
 directoryArtifactSource:
@@ -10,7 +10,8 @@ metadata:
   name: default
   namespace: gloo-system
 refreshRate: 60s
-status: {}
 vaultSecretSource:
-  address: http://host.docker.internal:8200
+  address: http://10.0.2.15:8200
   token: root
+watchNamespaces:
+- gloo-system
