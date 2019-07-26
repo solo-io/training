@@ -35,7 +35,7 @@ job "gloo" {
       driver = "docker"
 
       config {
-        image = "quay.io/solo-io/gloo:0.18.0"
+        image = "quay.io/solo-io/gloo:0.18.1"
         work_dir = "/"
         args = [
           "--dir=/data/",
@@ -93,7 +93,7 @@ job "gloo" {
       driver = "docker"
 
       config {
-        image = "quay.io/solo-io/gateway:0.18.0"
+        image = "quay.io/solo-io/gateway:0.18.1"
         work_dir = "/"
         args = [
           "--dir=/data/",
@@ -136,7 +136,7 @@ job "gloo" {
     task "gateway-proxy" {
       driver = "docker"
       config {
-        image = "quay.io/solo-io/gloo-envoy-wrapper:0.18.0"
+        image = "quay.io/solo-io/gloo-envoy-wrapper:0.18.1"
         port_map {
           http = 8080
           https = 8443

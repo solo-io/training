@@ -5,6 +5,10 @@ consul:
 consulKvSource: {}
 directoryArtifactSource:
   directory: /data/artifact
+# directoryConfigSource:
+#   directory: /data/config
+# directorySecretSource:
+#   directory: /data/secret
 discoveryNamespace: gloo-system
 metadata:
   name: default
