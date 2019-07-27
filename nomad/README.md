@@ -13,8 +13,8 @@ vagrant up && vagrant ssh
 Ports
 
 * Nomad UI - <http://localhost:4646>
-* Prometheus UI - <http://localhost:9998/>
-* Fabio LB - <http://localhost:9999>
+* Fabio UI - <http://localhost:9998/>
+* Prometheus LB - <http://localhost:9999>
 * Gloo admin UI - <http://localhost:19000/>
 * Consul UI - <http://localhost:8500>
 * Vault UI - <http://localhost:8200> token:root

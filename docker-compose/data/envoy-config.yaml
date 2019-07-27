@@ -2,8 +2,8 @@ node:
   cluster: gateway
   id: docker-compose-node
   metadata:
-    # this line must match !
-    role: "gloo-system~gateway-proxy"
+    # role's value is the key for the in-memory xds cache (projects/gloo/pkg/xds/envoy.go)
+    role: "gloo-system~gateway-proxy-v2"
 static_resources:
   clusters:
   - name: xds_cluster

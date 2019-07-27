@@ -158,12 +158,13 @@ node:
   cluster: gateway
   id: gateway~{{ env "NOMAD_ALLOC_ID" }}
   metadata:
-    # this line must match !
-    role: "gloo-system~gateway-proxy"
+    # role's value is the key for the in-memory xds cache (projects/gloo/pkg/xds/envoy.go)
+    role: "gloo-system~gateway-proxy-v2"
 
 static_resources:
   clusters:
   - name: xds_cluster
+    alt_stat_name: xds_cluster
     connect_timeout: 5.000s
     load_assignment:
       cluster_name: xds_cluster
@@ -175,6 +176,8 @@ static_resources:
                 address: {{ env "NOMAD_IP_gloo_xds" }}
                 port_value: {{ env "NOMAD_PORT_gloo_xds" }}
     http2_protocol_options: {}
+    upstream_connection_options:
+      tcp_keepalive: {}
     type: STATIC
 
   - name: admin_port_cluster
