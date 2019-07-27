@@ -12,7 +12,12 @@
 K8S_TOOL=minikube   # kind or minikube
 TILLER_MODE=local   # local or cluster
 GLOO_MODE=ent       # oss or ent
-GLOO_VERSION=0.17.3
+
+if [[ GLOO_MODE == oss ]]; then
+  GLOO_VERSION=0.18.2 # oss
+else
+  GLOO_VERSION=0.17.3 # ent
+fi
 
 # GLOOE_LICENSE_KEY=
 
@@ -53,6 +58,11 @@ case "$K8S_TOOL" in
 
   minikube)
     DEMO_CLUSTER_NAME="${DEMO_CLUSTER_NAME:-minikube}"
+
+    # brew install hyperkit
+    # minikube config set vm-driver hyperkit
+    # minikube config set cpus 4
+    # minikube config set memory 4096
 
     minikube delete --profile "$DEMO_CLUSTER_NAME" && true # Ignore errors
     minikube start --profile "$DEMO_CLUSTER_NAME"
@@ -134,7 +144,7 @@ case "$GLOO_MODE" in
     helm repo add gloo https://storage.googleapis.com/solo-public-helm
     helm upgrade --install gloo gloo/gloo \
       --namespace gloo-system \
-      --version "${GLOO_VERSION:-0.18.1}"
+      --version "${GLOO_VERSION:-0.18.2}"
     ;;
 
 esac
@@ -218,7 +228,11 @@ spec:
 EOF
 
 # Wait for deployment to be deployed and running
-kubectl --namespace gloo-system rollout status deployment/gateway-proxy --watch=true
+if [[ GLOO_VERSION < 0.18.0 ]]; then
+  kubectl --namespace gloo-system rollout status deployment/gateway-proxy --watch=true
+else
+  kubectl --namespace gloo-system rollout status deployment/gateway-proxy-v2 --watch=true
+fi
 
 # Wait for Virtual Service changes to get applied to proxy
 until [[ "$(kubectl --namespace gloo-system get virtualservice default -o=jsonpath='{.status.state}')" = "1" ]]; do
@@ -226,9 +240,13 @@ until [[ "$(kubectl --namespace gloo-system get virtualservice default -o=jsonpa
 done
 
 # Port-forward HTTP port vs use `glooctl proxy url` as port-forward is more resistent to IP changes and works with kind
-( kubectl --namespace gloo-system port-forward deployment/gateway-proxy 8080:8080 >/dev/null )&
+if [[ GLOO_VERSION < 0.18.0 ]]; then
+  ( kubectl --namespace gloo-system port-forward deployment/gateway-proxy 8080:8080 >/dev/null )&
+else
+  ( kubectl --namespace gloo-system port-forward deployment/gateway-proxy-v2 8080:8080 >/dev/null )&
+fi
 
-sleep 15
+sleep 20
 
 PROXY_URL="http://localhost:8080"
 

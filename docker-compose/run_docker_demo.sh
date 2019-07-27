@@ -27,4 +27,10 @@ sleep 20
 # curl --silent --show-error ${PROXY_URL:-http://localhost:8080}/petstore | jq
 http --json http://localhost:8080/petstore
 
+# curl --silent --show-error ${PROXY_URL:-http://localhost:8080}/petstore/findPets | jq
+http --json http://localhost:8080/petstore/findPets
+
+# curl --silent --show-error ${PROXY_URL:-http://localhost:8080}/petstore/findWithId/1 | jq
+http --json http://localhost:8080/petstore/findWithId/1
+
 echo "To clean up run docker-compose down"

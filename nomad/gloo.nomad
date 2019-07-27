@@ -35,7 +35,7 @@ job "gloo" {
       driver = "docker"
 
       config {
-        image = "quay.io/solo-io/gloo:0.18.1"
+        image = "quay.io/solo-io/gloo:0.18.2"
         work_dir = "/"
         args = [
           "--dir=/data/",
@@ -93,7 +93,7 @@ job "gloo" {
       driver = "docker"
 
       config {
-        image = "quay.io/solo-io/gateway:0.18.1"
+        image = "quay.io/solo-io/gateway:0.18.2"
         work_dir = "/"
         args = [
           "--dir=/data/",
@@ -136,7 +136,7 @@ job "gloo" {
     task "gateway-proxy" {
       driver = "docker"
       config {
-        image = "quay.io/solo-io/gloo-envoy-wrapper:0.18.1"
+        image = "quay.io/solo-io/gloo-envoy-wrapper:0.18.2"
         port_map {
           http = 8080
           https = 8443
@@ -160,40 +160,7 @@ node:
   metadata:
     # role's value is the key for the in-memory xds cache (projects/gloo/pkg/xds/envoy.go)
     role: "gloo-system~gateway-proxy-v2"
-
 static_resources:
-  clusters:
-  - name: xds_cluster
-    alt_stat_name: xds_cluster
-    connect_timeout: 5.000s
-    load_assignment:
-      cluster_name: xds_cluster
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: {{ env "NOMAD_IP_gloo_xds" }}
-                port_value: {{ env "NOMAD_PORT_gloo_xds" }}
-    http2_protocol_options: {}
-    upstream_connection_options:
-      tcp_keepalive: {}
-    type: STATIC
-
-  - name: admin_port_cluster
-    connect_timeout: 5.000s
-    type: STATIC
-    lb_policy: ROUND_ROBIN
-    load_assignment:
-      cluster_name: admin_port_cluster
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: 127.0.0.1
-                port_value: 19000
-
   listeners:
     - name: prometheus_listener
       address:
@@ -238,7 +205,36 @@ static_resources:
                 http_filters:
                   - name: envoy.router
                     config: {}
-
+  clusters:
+  - name: xds_cluster
+    alt_stat_name: xds_cluster
+    connect_timeout: 5.000s
+    load_assignment:
+      cluster_name: xds_cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: {{ env "NOMAD_IP_gloo_xds" }}
+                port_value: {{ env "NOMAD_PORT_gloo_xds" }}
+    http2_protocol_options: {}
+    upstream_connection_options:
+      tcp_keepalive: {}
+    type: STATIC
+  - name: admin_port_cluster
+    connect_timeout: 5.000s
+    type: STATIC
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: admin_port_cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 19000
 dynamic_resources:
   ads_config:
     api_type: GRPC
@@ -248,7 +244,6 @@ dynamic_resources:
     ads: {}
   lds_config:
     ads: {}
-
 admin:
   access_log_path: /dev/null
   address:
