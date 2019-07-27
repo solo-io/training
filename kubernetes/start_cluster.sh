@@ -228,7 +228,7 @@ spec:
 EOF
 
 # Wait for deployment to be deployed and running
-if [[ GLOO_VERSION < 0.18.0 ]]; then
+if [[ $GLOO_VERSION < 0.18.0 ]]; then
   kubectl --namespace gloo-system rollout status deployment/gateway-proxy --watch=true
 else
   kubectl --namespace gloo-system rollout status deployment/gateway-proxy-v2 --watch=true
@@ -240,7 +240,7 @@ until [[ "$(kubectl --namespace gloo-system get virtualservice default -o=jsonpa
 done
 
 # Port-forward HTTP port vs use `glooctl proxy url` as port-forward is more resistent to IP changes and works with kind
-if [[ GLOO_VERSION < 0.18.0 ]]; then
+if [[ $GLOO_VERSION < 0.18.0 ]]; then
   ( kubectl --namespace gloo-system port-forward deployment/gateway-proxy 8080:8080 >/dev/null )&
 else
   ( kubectl --namespace gloo-system port-forward deployment/gateway-proxy-v2 8080:8080 >/dev/null )&
