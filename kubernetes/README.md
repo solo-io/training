@@ -33,4 +33,6 @@ To run demo, execute the following commands.
 ./start_cluster.sh
 
 ./run_gloo_auth_demo.sh
+
+./run_gloo_adv_rate_limit.sh
 ```
