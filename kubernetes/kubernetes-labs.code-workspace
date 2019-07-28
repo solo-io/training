@@ -1,0 +1,27 @@
+{
+	"folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "auth_server_go_grpc"
+    },
+    {
+      "path": "auth_server_rate_limiting_adv"
+    }
+  ],
+  "settings": {},
+  "extensions": {
+    "recommendations": [
+      "ilevine.squash",
+      "editorconfig.editorconfig",
+      "oderwat.indent-rainbow",
+      "coenraads.bracket-pair-colorizer-2",
+      "ms-kubernetes-tools.vscode-kubernetes-tools",
+      "redhat.vscode-yaml",
+      "ms-kubernetes-tools.kind-vscode",
+      "googlecloudtools.cloudcode",
+      "ms-vscode.go",
+    ]
+  }
+}

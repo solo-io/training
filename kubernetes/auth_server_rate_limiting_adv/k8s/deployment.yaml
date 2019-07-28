@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: auth-server
-        lab: basic
+        lab: rate-limit
     spec:
       containers:
       - name: auth-server
