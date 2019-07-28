@@ -59,8 +59,10 @@ case "$K8S_TOOL" in
   minikube)
     DEMO_CLUSTER_NAME="${DEMO_CLUSTER_NAME:-minikube}"
 
-    # brew install hyperkit
+    # for Mac (can also use Virtual Box)
+    # brew install hyperkit; brew cask install minikube
     # minikube config set vm-driver hyperkit
+
     # minikube config set cpus 4
     # minikube config set memory 4096
 
@@ -154,53 +156,8 @@ esac
 #
 
 # Deploy echo-server service
-kubectl --namespace default apply --filename - <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: echo-server
-  namespace: default
-  labels:
-    app: echo-server
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: echo-server
-  template:
-    metadata:
-      labels:
-        app: echo-server
-    spec:
-      containers:
-      - name: echo-server
-        image: quay.io/sololabs/echo-server:v1
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: echo-server
-  labels:
-    app: echo-server
-spec:
-  ports:
-  - port: 8080
-    targetPort: 8080
-    protocol: TCP
-    name: http
-  selector:
-    app: echo-server
-EOF
+kubectl --namespace default apply \
+  --filename https://raw.githubusercontent.com/sololabs/echo-server/master/echo-server.yaml
 
 # Wait for deployment to be deployed and running
 kubectl --namespace default rollout status deployment/echo-server --watch=true
