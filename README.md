@@ -17,5 +17,6 @@
 
 ## References
 
-* Gloo Docs - <http://gloo.solo.io>
-* Solo Blogs - <https://medium.com/solo-io>
+* Gloo Docs - <https://gloo.solo.io>
+* Solo.io Blogs - <https://medium.com/solo-io>
+* Solo.io Public Slack - <https://slack.solo.io>
