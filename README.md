@@ -1,6 +1,6 @@
 # Solo.io Gloo Training
 
-Lab Modules:
+## Lab Modules
 
 * [Kubernetes](./kubernetes/README.md)
   * How to use Gloo with Kubernetes
@@ -9,8 +9,13 @@ Lab Modules:
 * [Docker Compose](./docker-compose/README.md)
   * How to use Gloo with Docker/File based deployments
 
-IDE options - free community options available
+## IDE options - free community options available
 
 * [Microsoft Visual Studio Code](https://code.visualstudio.com/)
 * [JetBrains Goland](https://www.jetbrains.com/go/)
 * vim and bash/zsh
+
+## References
+
+* Gloo Docs - <http://gloo.solo.io>
+* Solo Blogs - <https://medium.com/solo-io>
