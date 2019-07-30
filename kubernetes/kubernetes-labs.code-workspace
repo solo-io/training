@@ -10,7 +10,8 @@
       "path": "auth_server_rate_limiting_adv"
     }
   ],
-  "settings": {},
+  "settings": {
+  },
   "extensions": {
     "recommendations": [
       "ilevine.squash",

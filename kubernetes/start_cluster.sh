@@ -14,7 +14,7 @@ TILLER_MODE=local   # local or cluster
 GLOO_MODE=ent       # oss or ent
 
 if [[ GLOO_MODE == oss ]]; then
-  GLOO_VERSION=0.18.2 # oss
+  GLOO_VERSION=0.18.3 # oss
 else
   GLOO_VERSION=0.17.3 # ent
 fi
@@ -146,7 +146,7 @@ case "$GLOO_MODE" in
     helm repo add gloo https://storage.googleapis.com/solo-public-helm
     helm upgrade --install gloo gloo/gloo \
       --namespace gloo-system \
-      --version "${GLOO_VERSION:-0.18.2}"
+      --version "${GLOO_VERSION:-0.18.3}"
     ;;
 
 esac

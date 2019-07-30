@@ -6,7 +6,7 @@ FROM golang:1-alpine as builder
 RUN apk add --no-cache ca-certificates git
 
 # Set the working directory outside $GOPATH to enable the support for modules.
-WORKDIR /src
+WORKDIR /
 
 # Fetch dependencies first; they are less susceptible to change on every build
 # and will therefore be cached for speeding up the next build
@@ -18,7 +18,7 @@ COPY . ./
 
 # Build the executable to `/app`. Mark the build as statically linked.
 RUN CGO_ENABLED=0 go build \
-    -installsuffix 'static' \
+    -gcflags "-N -l" \
     -o /app .
 
 # Final stage: the running container.
