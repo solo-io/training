@@ -152,8 +152,12 @@ case "$GLOO_MODE" in
 esac
 
 #
-# Deploy example application
+# Deploy example applications
 #
+
+# Deploy petstore service
+kubectl --namespace default apply \
+  --filename https://raw.githubusercontent.com/solo-io/gloo/master/example/petstore/petstore.yaml
 
 # Deploy echo-server service
 kubectl --namespace default apply \
