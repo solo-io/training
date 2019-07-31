@@ -2,6 +2,9 @@
 
 ## Pre-requisites
 
+* Gloo command line tool
+  * [Gloo install docs](https://gloo.solo.io/installation/gateway/kubernetes/#install-command-line-tool-cli)
+  * macOS: `brew install solo-io/tap/glooctl`
 * Kubernetes cluster
   * [Minikube](https://github.com/kubernetes/minikube)
     * macOS: `brew install kubernetes-cli; brew cash minikube`
@@ -27,7 +30,7 @@ To use Gloo Enterprise, set an environment variable for Gloo key
 
 ## Labs
 
-To run demo, execute the following commands.
+To run demos, execute the following commands.
 
 ```shell
 ./start_cluster.sh
@@ -36,3 +39,28 @@ To run demo, execute the following commands.
 
 ./run_gloo_adv_rate_limit.sh
 ```
+
+## Exercises
+
+1. Virtual Service Routing
+   * create route from `/echo` to echo-server
+   * create route from `/petstore` to petstore
+   * create route from `/` with header `x-my-type` to
+     * `x-my-type:pet` to petstore
+     * `x-my-type:echo` to echo-server
+1. Authentication Server
+   * all requests`/echo` allowed
+   * requests to  `/petstore` with header `x-my-user` allowed; others denied
+   * requests to `/` with header `x-my-user` allowed
+   * appropriate body error message for declined requests, e.g., `not authorized path`, `missing header`, etc.
+   * add header to approved requests `x-authorized` with value `true` for authenticated requests, i.e. include
+     `x-my-user` header; `false` for other approved requests
+1. Rate Limiting
+   * Allow 1 request per minute for all requests to `/echo`
+   * Allow 2 requests per minute for all requests to `/petstore`
+   * Allow 2 requests per minute to all authorized users, ie. have header `x-authorized:true`
+   * Allow 5 requests per minute to all requests with header `vonage:FTW`
+1. Routing to external servers
+   * Reference [External Routing docs](https://gloo.solo.io/user_guides/gateway/external_services/static_upstream/) to
+     create a route to a different external service of your choosing
+   * **Bonus**: add in authentication and rate limiting for new external service routes
