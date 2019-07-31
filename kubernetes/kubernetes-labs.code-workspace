@@ -8,6 +8,9 @@
     },
     {
       "path": "auth_server_rate_limiting_adv"
+    },
+    {
+      "path": "auth_server_exercise"
     }
   ],
   "settings": {
