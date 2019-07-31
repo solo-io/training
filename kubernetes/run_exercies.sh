@@ -39,7 +39,7 @@ printf "Should return 200\n"
 http --json ${PROXY_URL:-http://localhost:8080}/echo
 
 printf "Should return 200 with x-authorized:true\n"
-# curl --silent --show-error --headers "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/echo | jq
+# curl --silent --show-error --header "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/echo | jq
 http --json ${PROXY_URL:-http://localhost:8080}/echo x-my-user:Scott
 
 printf "Should return 403\n"
@@ -47,23 +47,23 @@ printf "Should return 403\n"
 http --json ${PROXY_URL:-http://localhost:8080}/petstore
 
 printf "Should return 200\n"
-# curl --silent --show-error --headers "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
+# curl --silent --show-error --header "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
 http --json ${PROXY_URL:-http://localhost:8080}/petstore x-my-user:Scott
 
 printf "Should return 200 from echo-server\n"
-# curl --silent --show-error --headers "x-my-user: Scott" --headers "x-my-type: echo" ${PROXY_URL:-http://localhost:8080}/ | jq
+# curl --silent --show-error --header "x-my-user: Scott" --header "x-my-type: echo" ${PROXY_URL:-http://localhost:8080}/ | jq
 http --json ${PROXY_URL:-http://localhost:8080}/ x-my-user:Scott x-my-type:echo
 
 printf "Should return 200 from petstore\n"
-# curl --silent --show-error --headers "x-my-user: Scott" --headers "x-my-type: pet" ${PROXY_URL:-http://localhost:8080}/ | jq
+# curl --silent --show-error --header "x-my-user: Scott" --header "x-my-type: pet" ${PROXY_URL:-http://localhost:8080}/ | jq
 http --json ${PROXY_URL:-http://localhost:8080}/ x-my-user:Scott x-my-type:pet
 
 printf "Should return 404\n"
-# curl --silent --show-error --headers "x-my-user: Scott" --headers "x-my-type: foo" ${PROXY_URL:-http://localhost:8080}/ | jq
+# curl --silent --show-error --header "x-my-user: Scott" --header "x-my-type: foo" ${PROXY_URL:-http://localhost:8080}/ | jq
 http --json ${PROXY_URL:-http://localhost:8080}/ x-my-user:Scott x-my-type:foo
 
 printf "Should return 403\n"
-# curl --silent --show-error --headers "x-my-type: echo" ${PROXY_URL:-http://localhost:8080}/ | jq
+# curl --silent --show-error --header "x-my-type: echo" ${PROXY_URL:-http://localhost:8080}/ | jq
 http --json ${PROXY_URL:-http://localhost:8080}/ x-my-type:echo
 
 #
@@ -85,13 +85,13 @@ printf "Should return 429 rate limited\n"
 http --json ${PROXY_URL:-http://localhost:8080}/echo
 
 printf "Should return 200\n"
-# curl --silent --show-error --headers "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
+# curl --silent --show-error --header "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
 http --json ${PROXY_URL:-http://localhost:8080}/petstore x-my-user:Scott
 
 printf "Should return 200\n"
-# curl --silent --show-error --headers "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
+# curl --silent --show-error --header "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
 http --json ${PROXY_URL:-http://localhost:8080}/petstore x-my-user:Scott
 
 printf "Should return 429 rate limited\n"
-# curl --silent --show-error --headers "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
+# curl --silent --show-error --header "x-my-user: Scott" ${PROXY_URL:-http://localhost:8080}/petstore | jq
 http --json ${PROXY_URL:-http://localhost:8080}/petstore x-my-user:Scott

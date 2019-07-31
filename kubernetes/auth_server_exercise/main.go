@@ -4,7 +4,6 @@ import (
   "context"
   "log"
   "net"
-  "strconv"
 
   "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
   pb "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
