@@ -53,13 +53,13 @@ To run demos, execute the following commands.
    * requests to  `/petstore` with header `x-my-user` allowed; others denied
    * requests to `/` with header `x-my-user` allowed
    * appropriate body error message for declined requests, e.g., `not authorized path`, `missing header`, etc.
-   * add header to approved requests `x-authorized` with value `true` for authenticated requests, i.e. include
+   * add header to approved requests `x-authorized` with value `true` for authenticated requests, i.e. request includes
      `x-my-user` header; `false` for other approved requests
 1. Rate Limiting
    * Allow 1 request per minute for all requests to `/echo`
    * Allow 2 requests per minute for all requests to `/petstore`
    * Allow 2 requests per minute to all authorized users, ie. have header `x-authorized:true`
-   * Allow 5 requests per minute to all requests with header `vonage:FTW`
+   * **Bonus**: rate limit per unique authorized user
 1. Routing to external servers
    * Reference [External Routing docs](https://gloo.solo.io/user_guides/gateway/external_services/static_upstream/) to
      create a route to a different external service of your choosing
